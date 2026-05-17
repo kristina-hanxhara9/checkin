@@ -1,0 +1,40 @@
+# dependencies
+node_modules/
+
+# next.js build output
+.next/
+out/
+build/
+dist/
+
+# environment / secrets — NEVER commit these
+.env
+.env.local
+.env*.local
+
+# editor / OS cruft
+*.log
+.DS_Store
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# user content / test fixtures (don't push real inspection photos)
+test-photos/
+*.jpg
+*.jpeg
+*.png
+*.heic
+*.webp
+# but DO push project assets (logo etc.)
+!public/**/*.png
+!public/**/*.jpg
+!public/**/*.svg
+!public/**/*.webp
+!app/**/*.svg
+!app/**/*.png
+
+# typescript / build artefacts
+next-env.d.ts
+*.tsbuildinfo

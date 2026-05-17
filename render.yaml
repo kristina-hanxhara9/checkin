@@ -1,0 +1,32 @@
+# Render Blueprint — push this repo to GitHub, then click
+# "New +" → "Blueprint" in the Render dashboard and point it at the repo.
+# Render reads this file and provisions everything.
+services:
+  - type: web
+    name: propertycheck
+    runtime: node
+    plan: starter # $7/mo, always-on, 512MB. Bump to "standard" ($25, 2GB) if PDFs OOM.
+    region: frankfurt # closest to UK; switch to oregon/ohio/singapore if your users are elsewhere
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    healthCheckPath: /
+    envVars:
+      - key: NODE_VERSION
+        value: "20"
+      - key: NPM_CONFIG_LEGACY_PEER_DEPS
+        value: "true"
+      # Puppeteer downloads its own Chromium during install — these flags avoid
+      # the cache-skip behaviour that breaks rendering on Render.
+      - key: PUPPETEER_SKIP_DOWNLOAD
+        value: "false"
+      - key: PUPPETEER_CACHE_DIR
+        value: /opt/render/.cache/puppeteer
+      # ---- secrets (fill in from the Render dashboard, not here) ----
+      - key: NEXT_PUBLIC_AZURE_CLIENT_ID
+        sync: false
+      - key: NEXT_PUBLIC_AZURE_AUTHORITY
+        value: https://login.microsoftonline.com/common
+      - key: NEXT_PUBLIC_AZURE_REDIRECT_URI
+        sync: false # set this to https://propertycheck.onrender.com after first deploy
+      - key: GEMINI_API_KEY
+        sync: false

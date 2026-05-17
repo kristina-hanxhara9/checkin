@@ -7,7 +7,10 @@ services:
     runtime: node
     plan: starter # $7/mo, always-on, 512MB. Bump to "standard" ($25, 2GB) if PDFs OOM.
     region: frankfurt # closest to UK; switch to oregon/ohio/singapore if your users are elsewhere
-    buildCommand: npm install && npm run build
+    # Build explicitly installs Chrome to the PERSISTENT cache dir
+    # (/opt/render/project/.cache survives between deploys; /opt/render/.cache
+    # does NOT). The third "npm rebuild" step is a no-op safety net.
+    buildCommand: npm install && npx puppeteer browsers install chrome && npm run build
     startCommand: npm start
     healthCheckPath: /
     envVars:
@@ -15,12 +18,10 @@ services:
         value: "20"
       - key: NPM_CONFIG_LEGACY_PEER_DEPS
         value: "true"
-      # Puppeteer downloads its own Chromium during install — these flags avoid
-      # the cache-skip behaviour that breaks rendering on Render.
       - key: PUPPETEER_SKIP_DOWNLOAD
         value: "false"
       - key: PUPPETEER_CACHE_DIR
-        value: /opt/render/.cache/puppeteer
+        value: /opt/render/project/.cache/puppeteer
       # ---- secrets (fill in from the Render dashboard, not here) ----
       - key: NEXT_PUBLIC_AZURE_CLIENT_ID
         sync: false

@@ -30,18 +30,26 @@ export async function POST(req: NextRequest) {
     const pdfPath = buildReportPdfPath(data.propertySlug, data.tenancySlug, data.kind);
     const photosPath = buildPhotosPath(data.propertySlug, data.tenancySlug, data.kind);
 
-    // Take the first photoRef per item — naturally dedupes near-identical photos
-    // because Gemini groups visually-similar shots under the same item.
-    const firstRefs = new Set<string>();
+    // Collect up to 4 unique photo refs per room (used in the per-room photo grid
+    // at the top of each section). Deduplicated by filename so we never fetch
+    // the same image twice.
+    const wantedRefs = new Set<string>();
     for (const room of data.rooms) {
+      const seenInRoom = new Set<string>();
       for (const item of room.items) {
-        if (item.photoRefs[0]) firstRefs.add(item.photoRefs[0]);
+        for (const ref of item.photoRefs) {
+          if (seenInRoom.size >= 4) break;
+          if (seenInRoom.has(ref)) continue;
+          seenInRoom.add(ref);
+          wantedRefs.add(ref);
+        }
+        if (seenInRoom.size >= 4) break;
       }
     }
 
     const [, photos, branding] = await Promise.all([
       saveJson(client, jsonPath, data),
-      fetchPhotosAsDataUrls(client, photosPath, Array.from(firstRefs)),
+      fetchPhotosAsDataUrls(client, photosPath, Array.from(wantedRefs)),
       loadBranding(client),
     ]);
 

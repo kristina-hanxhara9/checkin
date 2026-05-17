@@ -22,11 +22,15 @@ ${opts.filenames.map((f, i) => `  ${i + 1}. ${f}`).join("\n")}
 Tasks:
 1. Group photos by room. Infer room identity from visual cues (kitchen appliances, bathroom fixtures, bedroom furniture, living-room seating, hallway flooring, etc.).
 2. **Deduplicate within each room.** Multiple photos may show the SAME item from different angles, zooms, or just be burst-mode duplicates. Treat all of those as ONE item — do NOT create separate item entries for them. List every such photo's filename in that item's "photoRefs" array.
-3. For each *unique* item or surface in the room (Oven, Fridge, Walls, Floor, Sink, Mirror, Bed frame, Wardrobe, Carpet, etc.), produce one entry.
+3. For each *unique* item or surface in the room, produce ONE entry. Stay at a sensible inventory-clerk level of granularity:
+   - **Good item names**: "Oven", "Fridge", "Walls", "Floor", "Sink", "Mirror", "Bed frame", "Wardrobe", "Carpet", "Windows", "Lighting", "Door".
+   - **Avoid splitting into micro-parts**: do NOT create separate items like "Oven door", "Oven handle", "Oven knob 1", "Oven knob 2". One "Oven" entry suffices unless a specific part is damaged.
+   - **Calibrate to evidence**: if a single wide-angle photo is all you have for a room, produce 4–8 items covering major surfaces + major fixtures. Don't invent items you can't actually see clearly.
+   - **Hard cap**: never more than 10 items per room.
 4. Rate each item: "Good", "Fair", or "Poor". When multiple photos show the same item, base the rating on the clearest/most-informative view.
 5. Add a factual one-sentence note per item describing what you observe across all of its photos.
 6. Set "flagged": true if the item shows damage, missing parts, unusual wear, or anything that may affect the deposit.
-7. Populate "photoRefs" with EVERY filename showing that item, in order of importance (best representative photo first). The first filename will be used as the cover photo in PDF reports.
+7. Populate "photoRefs" with EVERY filename showing that item, in order of importance (best representative photo first).
 8. Set the room "confidence" based on how certain you are about the room identity.
 
 Return ONLY valid JSON matching this shape:

@@ -16,11 +16,23 @@ function escape(text: string): string {
   });
 }
 
-function firstPhotoFor(refs: string[], photos: PhotoDataUrls): string | null {
-  for (const ref of refs) {
-    if (photos[ref]) return photos[ref];
+function uniqueRoomPhotos(
+  room: { items: { photoRefs: string[] }[] },
+  photos: PhotoDataUrls,
+  max = 4
+): string[] {
+  const seen = new Set<string>();
+  const out: string[] = [];
+  for (const item of room.items) {
+    for (const ref of item.photoRefs) {
+      if (out.length >= max) return out;
+      if (seen.has(ref)) continue;
+      seen.add(ref);
+      const dataUrl = photos[ref];
+      if (dataUrl) out.push(dataUrl);
+    }
   }
-  return null;
+  return out;
 }
 
 function brandingHeader(b: ResolvedBranding | undefined): string {
@@ -82,33 +94,43 @@ export function renderReportHtml(
   </div>
 
   ${data.rooms
-    .map((room) => `
+    .map((room) => {
+      const roomPhotos = uniqueRoomPhotos(room, photos, 4);
+      const photoGrid = roomPhotos.length > 0
+        ? `<div style="display: flex; flex-wrap: wrap; gap: 8px; margin: 8px 0 12px 0;">
+            ${roomPhotos
+              .map(
+                (url) => `<img src="${url}" alt="" style="width: 160px; height: 110px; object-fit: cover; border-radius: 6px; border: 1px solid #e2e8f0;" />`
+              )
+              .join("")}
+          </div>`
+        : "";
+      return `
       <h2>${escape(room.room)}</h2>
-      <div class="room-note">Room confidence: ${escape(room.confidence)}</div>
+      <div class="room-note">Room confidence: ${escape(room.confidence)} · ${room.items.length} item${room.items.length === 1 ? "" : "s"}</div>
+      ${photoGrid}
       <table>
         <thead>
           <tr>
-            <th style="width: 15%;">Photo</th>
-            <th style="width: 22%;">Item</th>
+            <th style="width: 28%;">Item</th>
             <th style="width: 12%;">Rating</th>
             <th>Notes</th>
           </tr>
         </thead>
         <tbody>
           ${room.items
-            .map((item) => {
-              const photo = firstPhotoFor(item.photoRefs, photos);
-              return `
+            .map(
+              (item) => `
             <tr>
-              <td>${photo ? `<img src="${photo}" alt="" style="width: 110px; height: 80px; object-fit: cover; border-radius: 4px; border: 1px solid #e2e8f0;" />` : '<span style="color: #94a3b8;">—</span>'}</td>
               <td>${escape(item.name)}${item.flagged ? '<span class="badge badge-flag">flagged</span>' : ""}</td>
               <td><span class="badge ${ratingClass(item.rating)}">${escape(item.rating)}</span></td>
               <td>${escape(item.notes || "—")}</td>
-            </tr>`;
-            })
+            </tr>`
+            )
             .join("")}
         </tbody>
-      </table>`)
+      </table>`;
+    })
     .join("")}
 
   <div class="footer">${brandingFooter(branding)}</div>

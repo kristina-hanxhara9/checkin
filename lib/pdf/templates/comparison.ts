@@ -20,23 +20,10 @@ function formatVerdict(v: string): string {
   return v.replace(/_/g, " ");
 }
 
-function photoCell(dataUrl: string | undefined): string {
-  if (!dataUrl) return '<span style="color: #94a3b8; font-size: 10px;">no photo</span>';
-  return `<img src="${dataUrl}" alt="" style="width: 80px; height: 60px; object-fit: cover; border-radius: 4px; border: 1px solid #e2e8f0;" />`;
-}
-
 export interface ComparisonPhotos {
-  checkin: PhotoDataUrls;
-  checkout: PhotoDataUrls;
-  refs: Record<string, { checkin?: string; checkout?: string }>; // key: "<room>::<itemName>"
-}
-
-function key(room: string, itemName: string) {
-  return `${room}::${itemName}`;
-}
-
-export function buildComparisonPhotoKey(room: string, itemName: string) {
-  return key(room, itemName);
+  // Up to N unique check-in / check-out photos per room, keyed by room name.
+  checkinByRoom: Record<string, string[]>; // data URLs
+  checkoutByRoom: Record<string, string[]>;
 }
 
 function brandingHeader(b: ResolvedBranding | undefined): string {
@@ -60,6 +47,22 @@ function brandingFooter(b: ResolvedBranding | undefined): string {
   return parts.join(" · ");
 }
 
+function photoStrip(label: string, dataUrls: string[] | undefined): string {
+  if (!dataUrls || dataUrls.length === 0) {
+    return `<div style="flex: 1;"><div style="font-size: 11px; font-weight: 600; color: #64748b; margin-bottom: 4px;">${escape(label)}</div><div style="font-size: 11px; color: #94a3b8;">no photos</div></div>`;
+  }
+  const imgs = dataUrls
+    .map(
+      (u) =>
+        `<img src="${u}" alt="" style="width: 130px; height: 90px; object-fit: cover; border-radius: 4px; border: 1px solid #e2e8f0;" />`
+    )
+    .join("");
+  return `<div style="flex: 1;">
+    <div style="font-size: 11px; font-weight: 600; color: #64748b; margin-bottom: 4px;">${escape(label)}</div>
+    <div style="display: flex; flex-wrap: wrap; gap: 6px;">${imgs}</div>
+  </div>`;
+}
+
 export function renderComparisonHtml(
   data: ComparisonReport,
   photos?: ComparisonPhotos,
@@ -71,7 +74,9 @@ export function renderComparisonHtml(
     0
   );
   const fmtCost = (n: number | null) =>
-    n == null ? "—" : new Intl.NumberFormat("en-GB", { style: "currency", currency: "GBP" }).format(n);
+    n == null
+      ? "—"
+      : new Intl.NumberFormat("en-GB", { style: "currency", currency: "GBP" }).format(n);
 
   return `<!doctype html>
 <html>
@@ -102,44 +107,48 @@ export function renderComparisonHtml(
   <p>${escape(data.summary.depositRecommendation)}</p>
 
   ${data.rooms
-    .map(
-      (room) => `
+    .map((room) => {
+      const checkinPhotos = photos?.checkinByRoom[room.room] ?? [];
+      const checkoutPhotos = photos?.checkoutByRoom[room.room] ?? [];
+      const hasAnyPhotos = checkinPhotos.length > 0 || checkoutPhotos.length > 0;
+      return `
     <h2>${escape(room.room)}</h2>
+    ${
+      hasAnyPhotos
+        ? `<div style="display: flex; gap: 16px; margin: 8px 0 12px 0;">
+            ${photoStrip("Check-in", checkinPhotos)}
+            ${photoStrip("Check-out", checkoutPhotos)}
+          </div>`
+        : ""
+    }
     <table>
       <thead>
         <tr>
-          <th style="width: 12%;">Item</th>
-          <th style="width: 14%;">Check-in</th>
-          <th style="width: 18%;">— state —</th>
-          <th style="width: 14%;">Check-out</th>
-          <th style="width: 18%;">— state —</th>
-          <th style="width: 10%;">Verdict</th>
+          <th style="width: 18%;">Item</th>
+          <th style="width: 22%;">Check-in state</th>
+          <th style="width: 22%;">Check-out state</th>
+          <th style="width: 12%;">Verdict</th>
           <th>Reason</th>
-          <th style="width: 8%;">Cost</th>
+          <th style="width: 9%;">Cost</th>
         </tr>
       </thead>
       <tbody>
         ${room.items
-          .map((item) => {
-            const refs = photos?.refs[key(room.room, item.itemName)];
-            const checkinPhoto = refs?.checkin ? photos?.checkin[refs.checkin] : undefined;
-            const checkoutPhoto = refs?.checkout ? photos?.checkout[refs.checkout] : undefined;
-            return `
+          .map(
+            (item) => `
           <tr>
             <td>${escape(item.itemName)}</td>
-            <td>${photoCell(checkinPhoto)}</td>
             <td>${escape(item.before)}</td>
-            <td>${photoCell(checkoutPhoto)}</td>
             <td>${escape(item.after)}</td>
             <td><span class="badge verdict-${escape(item.verdict)}">${escape(formatVerdict(item.verdict))}</span></td>
             <td>${escape(item.reason)}</td>
             <td>${fmtCost(item.estimatedCost)}</td>
-          </tr>`;
-          })
+          </tr>`
+          )
           .join("")}
       </tbody>
-    </table>`
-    )
+    </table>`;
+    })
     .join("")}
 
   <div class="footer">${brandingFooter(branding)}</div>

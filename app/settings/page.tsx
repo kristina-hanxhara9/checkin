@@ -84,7 +84,10 @@ function SettingsContent() {
     try {
       const res = await authedFetch(getToken, "/api/branding/logo", {
         method: "POST",
-        headers: { "Content-Type": file.type },
+        headers: {
+          "Content-Type": file.type || "application/octet-stream",
+          "X-Filename": file.name,
+        },
         body: await file.arrayBuffer(),
       });
       if (!res.ok) {

@@ -1,29 +1,64 @@
 import { Camera, Sparkles, FileText } from "lucide-react";
 
+type Theme = {
+  bg: string;
+  ring: string;
+  badge: string;
+  number: string;
+  accent: string;
+};
+
+const THEMES: Record<"blue" | "amber" | "emerald", Theme> = {
+  blue: {
+    bg: "bg-sky-50",
+    ring: "ring-sky-200",
+    badge: "bg-sky-600 text-white",
+    number: "bg-sky-600 text-white",
+    accent: "text-sky-700",
+  },
+  amber: {
+    bg: "bg-amber-50",
+    ring: "ring-amber-200",
+    badge: "bg-amber-500 text-white",
+    number: "bg-amber-500 text-white",
+    accent: "text-amber-700",
+  },
+  emerald: {
+    bg: "bg-emerald-50",
+    ring: "ring-emerald-200",
+    badge: "bg-emerald-600 text-white",
+    number: "bg-emerald-600 text-white",
+    accent: "text-emerald-700",
+  },
+};
+
 export function StepFlow() {
   return (
     <section className="grid grid-cols-1 gap-6 md:grid-cols-3">
       <StepCard
+        theme={THEMES.blue}
         number="1"
         label="Upload"
         title="Drop photos"
-        body="Walk the property, take photos as you go. Drag-drop or shoot from your phone."
+        body="Walk the property, snap photos. Drag-drop or shoot from your phone."
         visual={<PhotosVisual />}
         icon={<Camera className="h-4 w-4" />}
       />
       <StepCard
+        theme={THEMES.amber}
         number="2"
         label="Categorise"
         title="AI does the typing"
-        body="Rooms and items detected automatically. Each rated Good · Fair · Poor with notes."
+        body="Rooms and items detected automatically. Rated Good · Fair · Poor."
         visual={<CategoriseVisual />}
         icon={<Sparkles className="h-4 w-4" />}
       />
       <StepCard
+        theme={THEMES.emerald}
         number="3"
         label="Deliver"
         title="Branded PDF"
-        body="A clean condition report — and at end-of-tenancy, an AI deposit comparison."
+        body="A condition report — and at end of tenancy, a deposit comparison."
         visual={<PdfVisual />}
         icon={<FileText className="h-4 w-4" />}
       />
@@ -32,6 +67,7 @@ export function StepFlow() {
 }
 
 function StepCard({
+  theme,
   number,
   label,
   title,
@@ -39,6 +75,7 @@ function StepCard({
   visual,
   icon,
 }: {
+  theme: Theme;
   number: string;
   label: string;
   title: string;
@@ -47,51 +84,70 @@ function StepCard({
   icon: React.ReactNode;
 }) {
   return (
-    <div className="flex flex-col rounded-xl border bg-card p-5">
-      <div className="mb-4 flex h-32 items-center justify-center rounded-lg bg-muted/40 p-3">
+    <div className={`flex flex-col rounded-2xl p-6 ring-1 transition-transform hover:-translate-y-0.5 ${theme.bg} ${theme.ring}`}>
+      <div className="mb-5 flex h-40 items-center justify-center">
         {visual}
       </div>
-      <div className="flex items-center gap-2 text-xs font-medium text-muted-foreground">
-        <span className="flex h-5 w-5 items-center justify-center rounded-full bg-foreground text-[10px] text-background">
+      <div className="flex items-center gap-2">
+        <span className={`flex h-6 w-6 items-center justify-center rounded-full text-[11px] font-bold ${theme.number}`}>
           {number}
         </span>
-        <span className="inline-flex items-center gap-1">{icon} {label}</span>
+        <span className={`inline-flex items-center gap-1 text-xs font-semibold uppercase tracking-wider ${theme.accent}`}>
+          {icon} {label}
+        </span>
       </div>
-      <h3 className="mt-2 text-lg font-semibold">{title}</h3>
-      <p className="mt-1 text-sm text-muted-foreground">{body}</p>
+      <h3 className="mt-3 text-xl font-bold tracking-tight">{title}</h3>
+      <p className="mt-2 text-sm text-foreground/70">{body}</p>
     </div>
   );
 }
 
 function PhotosVisual() {
   return (
-    <svg viewBox="0 0 160 100" xmlns="http://www.w3.org/2000/svg" className="h-full w-auto" aria-hidden="true">
-      {Array.from({ length: 6 }).map((_, i) => {
-        const col = i % 3;
-        const row = Math.floor(i / 3);
-        return (
-          <g key={i} transform={`translate(${10 + col * 48} ${10 + row * 42})`}>
-            <rect width="40" height="32" rx="4" className="fill-card stroke-border" strokeWidth="1" />
-            <circle cx="9" cy="11" r="3" className="fill-muted-foreground/40" />
-            <path d="M0 26 L13 18 L23 23 L40 13 L40 32 L0 32 Z" className="fill-muted-foreground/30" />
-          </g>
-        );
-      })}
+    <svg viewBox="0 0 200 140" xmlns="http://www.w3.org/2000/svg" className="h-full w-auto" aria-hidden="true">
+      {/* back row */}
+      {[0, 1, 2].map((i) => (
+        <g key={`back-${i}`} transform={`translate(${20 + i * 56} 12)`}>
+          <rect width="46" height="36" rx="5" className="fill-white" stroke="#bae6fd" strokeWidth="1.5" />
+          <circle cx="11" cy="11" r="3.5" className="fill-sky-300" />
+          <path d="M0 30 L15 20 L26 26 L46 14 L46 36 L0 36 Z" className="fill-sky-200" />
+        </g>
+      ))}
+      {/* front row, offset */}
+      {[0, 1, 2].map((i) => (
+        <g key={`front-${i}`} transform={`translate(${48 + i * 56} 72)`}>
+          <rect width="46" height="36" rx="5" className="fill-white" stroke="#7dd3fc" strokeWidth="1.5" />
+          <circle cx="11" cy="11" r="3.5" className="fill-sky-400" />
+          <path d="M0 30 L15 20 L26 26 L46 14 L46 36 L0 36 Z" className="fill-sky-300" />
+        </g>
+      ))}
     </svg>
   );
 }
 
 function CategoriseVisual() {
   return (
-    <svg viewBox="0 0 160 100" xmlns="http://www.w3.org/2000/svg" className="h-full w-auto" aria-hidden="true">
-      <rect x="12" y="10" width="136" height="80" rx="8" className="fill-card stroke-border" strokeWidth="1" />
-      <rect x="22" y="20" width="60" height="6" rx="2" className="fill-foreground" />
-      <rect x="115" y="20" width="22" height="6" rx="3" className="fill-emerald-500/80" />
-      {[36, 50, 64, 78].map((y, i) => (
-        <g key={i}>
-          <rect x="22" y={y} width="50" height="4" rx="1" className="fill-foreground/70" />
-          <rect x="80" y={y} width={18 - (i % 2) * 4} height="4" rx="1" className={i % 3 === 0 ? "fill-amber-500/80" : "fill-emerald-500/80"} />
-          <rect x="105" y={y} width="32" height="4" rx="1" className="fill-muted-foreground/40" />
+    <svg viewBox="0 0 200 140" xmlns="http://www.w3.org/2000/svg" className="h-full w-auto" aria-hidden="true">
+      {/* card */}
+      <rect x="14" y="14" width="172" height="112" rx="10" className="fill-white" stroke="#fde68a" strokeWidth="1.5" />
+      {/* room title */}
+      <rect x="28" y="28" width="62" height="8" rx="2" className="fill-slate-800" />
+      <rect x="148" y="28" width="28" height="8" rx="4" className="fill-amber-400" />
+      {/* sparkle */}
+      <path d="M168 50 l2 -4 l2 4 l4 2 l-4 2 l-2 4 l-2 -4 l-4 -2 z" className="fill-amber-500" />
+      {/* item rows */}
+      {[50, 66, 82, 98].map((y, i) => (
+        <g key={y}>
+          <rect x="28" y={y} width="56" height="5" rx="1.5" className="fill-slate-700" />
+          <rect
+            x="92"
+            y={y}
+            width="22"
+            height="5"
+            rx="2.5"
+            className={i === 1 ? "fill-amber-500" : "fill-emerald-500"}
+          />
+          <rect x="122" y={y} width="50" height="5" rx="1.5" className="fill-slate-300" />
         </g>
       ))}
     </svg>
@@ -100,23 +156,28 @@ function CategoriseVisual() {
 
 function PdfVisual() {
   return (
-    <svg viewBox="0 0 160 100" xmlns="http://www.w3.org/2000/svg" className="h-full w-auto" aria-hidden="true">
-      <rect x="50" y="8" width="74" height="86" rx="6" className="fill-foreground/10" />
-      <rect x="44" y="4" width="74" height="86" rx="6" className="fill-card stroke-border" strokeWidth="1.5" />
-      <rect x="44" y="4" width="74" height="14" rx="6" className="fill-foreground" />
-      <rect x="44" y="12" width="74" height="6" className="fill-foreground" />
-      <rect x="50" y="8" width="22" height="6" rx="1" className="fill-card" />
-      <rect x="50" y="26" width="48" height="4" rx="1" className="fill-foreground/70" />
-      <rect x="50" y="34" width="62" height="2" rx="1" className="fill-muted-foreground/50" />
-      <rect x="50" y="40" width="50" height="2" rx="1" className="fill-muted-foreground/50" />
+    <svg viewBox="0 0 200 140" xmlns="http://www.w3.org/2000/svg" className="h-full w-auto" aria-hidden="true">
+      {/* shadow */}
+      <rect x="58" y="14" width="92" height="120" rx="8" className="fill-emerald-200/60" />
+      {/* page */}
+      <rect x="52" y="8" width="92" height="120" rx="8" className="fill-white" stroke="#86efac" strokeWidth="1.5" />
+      {/* header */}
+      <rect x="52" y="8" width="92" height="22" rx="8" className="fill-emerald-700" />
+      <rect x="52" y="22" width="92" height="8" className="fill-emerald-700" />
+      <rect x="62" y="14" width="30" height="8" rx="2" className="fill-white" />
+      {/* title */}
+      <rect x="62" y="38" width="56" height="5" rx="1.5" className="fill-slate-800" />
+      <rect x="62" y="48" width="72" height="3" rx="1" className="fill-slate-400" />
+      {/* photo strip */}
       {[0, 1, 2].map((i) => (
-        <rect key={i} x={50 + i * 22} y={48} width="18" height="14" rx="2" className="fill-muted" />
+        <rect key={i} x={62 + i * 22} y="58" width="18" height="14" rx="2" className="fill-emerald-100" stroke="#a7f3d0" strokeWidth="1" />
       ))}
-      {[68, 76, 84].map((y, i) => (
+      {/* items */}
+      {[82, 92, 102, 112].map((y, i) => (
         <g key={y}>
-          <rect x="50" y={y} width="22" height="3" rx="1" className="fill-foreground/70" />
-          <rect x="74" y={y} width="10" height="3" rx="1" className={i === 1 ? "fill-amber-500/80" : "fill-emerald-500/80"} />
-          <rect x="88" y={y} width="28" height="3" rx="1" className="fill-muted-foreground/40" />
+          <rect x="62" y={y} width="26" height="3" rx="1" className="fill-slate-700" />
+          <rect x="92" y={y} width="12" height="3" rx="1.5" className={i === 2 ? "fill-amber-500" : "fill-emerald-500"} />
+          <rect x="108" y={y} width="26" height="3" rx="1" className="fill-slate-300" />
         </g>
       ))}
     </svg>

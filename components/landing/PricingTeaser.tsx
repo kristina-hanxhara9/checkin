@@ -64,7 +64,7 @@ function PlanCard({
 }) {
   return (
     <div
-      className={`relative flex flex-col rounded-2xl p-6 transition-transform hover:-translate-y-0.5 ${
+      className={`depth-card relative flex flex-col rounded-2xl p-6 ${
         highlight
           ? "bg-gradient-to-br from-emerald-50 to-emerald-100 ring-2 ring-emerald-500"
           : "bg-slate-50 ring-1 ring-slate-200"

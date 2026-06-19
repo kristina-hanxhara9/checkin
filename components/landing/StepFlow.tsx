@@ -84,7 +84,7 @@ function StepCard({
   icon: React.ReactNode;
 }) {
   return (
-    <div className={`flex flex-col rounded-2xl p-6 ring-1 transition-transform hover:-translate-y-0.5 ${theme.bg} ${theme.ring}`}>
+    <div className={`depth-card flex flex-col rounded-2xl p-6 ring-1 ${theme.bg} ${theme.ring}`}>
       <div className="mb-5 flex h-40 items-center justify-center">
         {visual}
       </div>

@@ -1,3 +1,6 @@
+"use client";
+
+import { motion } from "framer-motion";
 import { User, Building2, ClipboardCheck } from "lucide-react";
 
 const PERSONAS = [
@@ -27,15 +30,32 @@ const ACCENT_CLASSES: Record<"sky" | "amber" | "emerald", { bg: string; icon: st
   emerald: { bg: "bg-emerald-50", icon: "text-emerald-700 bg-emerald-100", ring: "ring-emerald-200" },
 };
 
+const CONTAINER_VARIANTS = {
+  hidden: {},
+  show: { transition: { staggerChildren: 0.12, delayChildren: 0.05 } },
+};
+const CHILD_VARIANTS = {
+  hidden: { opacity: 0, y: 24 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] as const } },
+};
+
 export function UseCases() {
   return (
-    <div className="grid grid-cols-1 gap-5 md:grid-cols-3">
+    <motion.div
+      variants={CONTAINER_VARIANTS}
+      initial="hidden"
+      whileInView="show"
+      viewport={{ once: true, amount: 0.2 }}
+      className="grid grid-cols-1 gap-5 md:grid-cols-3"
+    >
       {PERSONAS.map((p) => {
         const Icon = p.icon;
         const accent = ACCENT_CLASSES[p.accent];
         return (
-          <div
+          <motion.div
             key={p.title}
+            variants={CHILD_VARIANTS}
+            whileHover={{ y: -6, transition: { type: "spring", stiffness: 320, damping: 20 } }}
             className={`depth-card flex flex-col rounded-2xl ring-1 ${accent.bg} ${accent.ring} p-6`}
           >
             <div className={`flex h-10 w-10 items-center justify-center rounded-xl ${accent.icon}`}>
@@ -43,9 +63,9 @@ export function UseCases() {
             </div>
             <h3 className="mt-4 text-lg font-bold tracking-tight">{p.title}</h3>
             <p className="mt-2 text-sm text-foreground/70">{p.body}</p>
-          </div>
+          </motion.div>
         );
       })}
-    </div>
+    </motion.div>
   );
 }

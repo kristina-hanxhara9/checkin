@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { useIsAuthenticated, useMsal } from "@azure/msal-react";
 import { Home } from "lucide-react";
 import { SignInButton } from "@/components/auth/SignInButton";
-import { HeroIllustration } from "@/components/landing/HeroIllustration";
+import { HeroVisual } from "@/components/landing/HeroVisual";
 import { FloatingChips } from "@/components/landing/FloatingChips";
 import { StepFlow } from "@/components/landing/StepFlow";
 import { PdfMockup } from "@/components/landing/PdfMockup";
@@ -84,7 +84,7 @@ export default function Landing() {
 
           <Reveal delay={200} className="relative">
             <FloatingChips />
-            <HeroIllustration />
+            <HeroVisual />
           </Reveal>
         </div>
       </section>

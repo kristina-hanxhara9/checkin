@@ -1,26 +1,51 @@
 "use client";
 
-import { cn } from "@/lib/utils/cn";
-import { useScrollReveal } from "@/lib/hooks/useScrollReveal";
+import { motion } from "framer-motion";
+
+type Tag = "div" | "span" | "section" | "header" | "h1" | "h2" | "h3" | "p";
 
 interface Props {
   children: React.ReactNode;
   delay?: number;
+  yOffset?: number;
   className?: string;
-  as?: "div" | "section" | "header" | "h1" | "h2" | "p" | "span";
+  as?: Tag;
 }
 
-export function Reveal({ children, delay = 0, className, as: Tag = "div" }: Props) {
-  const [ref, visible] = useScrollReveal<HTMLDivElement>();
+const MOTION_TAGS = {
+  div: motion.div,
+  span: motion.span,
+  section: motion.section,
+  header: motion.header,
+  h1: motion.h1,
+  h2: motion.h2,
+  h3: motion.h3,
+  p: motion.p,
+} as const;
+
+/**
+ * Scroll-triggered reveal using framer-motion's whileInView.
+ * Keeps the same public API as the previous IntersectionObserver version.
+ */
+export function Reveal({
+  children,
+  delay = 0,
+  yOffset = 24,
+  className,
+  as = "div",
+}: Props) {
+  const Tag = MOTION_TAGS[as];
   return (
     <Tag
-      ref={ref as React.Ref<HTMLDivElement>}
-      className={cn(
-        "transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] will-change-transform motion-reduce:transform-none motion-reduce:transition-none",
-        visible ? "translate-y-0 opacity-100" : "translate-y-6 opacity-0",
-        className
-      )}
-      style={{ transitionDelay: visible ? `${delay}ms` : "0ms" }}
+      className={className}
+      initial={{ opacity: 0, y: yOffset }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, amount: 0.18, margin: "0px 0px -80px 0px" }}
+      transition={{
+        duration: 0.7,
+        ease: [0.22, 1, 0.36, 1],
+        delay: delay / 1000,
+      }}
     >
       {children}
     </Tag>

@@ -31,3 +31,9 @@ services:
         sync: false # set this to https://propertycheck.onrender.com after first deploy
       - key: GEMINI_API_KEY
         sync: false
+      # Optional Gemini model overrides. Leave unset in dashboard to use
+      # the defaults (gemini-3.5-flash, gemini-3.5-pro).
+      - key: GEMINI_FLASH_MODEL
+        sync: false
+      - key: GEMINI_PRO_MODEL
+        sync: false

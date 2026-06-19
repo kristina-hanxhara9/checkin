@@ -31,3 +31,12 @@
   * { @apply border-border; }
   body { @apply bg-background text-foreground; }
 }
+
+@keyframes ai-pulse {
+  0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 hsl(var(--foreground) / 0.25); }
+  50% { transform: scale(1.05); box-shadow: 0 0 0 6px hsl(var(--foreground) / 0); }
+}
+
+.ai-badge {
+  animation: ai-pulse 2.4s ease-in-out infinite;
+}

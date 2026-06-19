@@ -17,6 +17,7 @@ import { readdir, readFile } from "node:fs/promises";
 import { extname, join, resolve } from "node:path";
 import { config as loadDotenv } from "dotenv";
 import { GoogleGenAI } from "@google/genai";
+import { GEMINI_FLASH } from "../lib/constants";
 import { categorisePrompt } from "../lib/gemini/prompts";
 import { parseAndValidate, validateCheckinData } from "../lib/gemini/validate";
 
@@ -70,11 +71,11 @@ async function main() {
     filenames: buffers.map((p) => p.name),
   });
 
-  console.log(`🤖 Calling Gemini 2.5 Flash with all ${buffers.length} photo${buffers.length === 1 ? "" : "s"} (Gemini handles dedup)…`);
+  console.log(`🤖 Calling ${GEMINI_FLASH} with all ${buffers.length} photo${buffers.length === 1 ? "" : "s"} (Gemini handles dedup)…`);
   const t2 = Date.now();
   const ai = new GoogleGenAI({ apiKey });
   const response = await ai.models.generateContent({
-    model: "gemini-2.5-flash",
+    model: GEMINI_FLASH,
     contents: [{ role: "user", parts: [...imageParts, { text: prompt }] }],
     config: { responseMimeType: "application/json", temperature: 0.2 },
   });

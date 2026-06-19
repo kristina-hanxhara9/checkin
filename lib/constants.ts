@@ -31,5 +31,7 @@ export const MAX_PHOTOS_PER_PHASE = 60;
 export const MAX_CATEGORISATIONS_PER_TENANCY = 10;
 export const MAX_COMPARISONS_PER_TENANCY = 5;
 
-export const GEMINI_FLASH = "gemini-2.5-flash";
-export const GEMINI_PRO = "gemini-2.5-pro";
+// Override at deploy time without a code change. Set GEMINI_FLASH_MODEL /
+// GEMINI_PRO_MODEL in Render's env vars to swap to a newer/different model.
+export const GEMINI_FLASH = process.env.GEMINI_FLASH_MODEL ?? "gemini-3.5-flash";
+export const GEMINI_PRO = process.env.GEMINI_PRO_MODEL ?? "gemini-3.5-pro";

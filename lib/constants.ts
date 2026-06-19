@@ -14,7 +14,21 @@ export const FILE = {
   comparisonData: "comparison-data.json",
   comparisonReport: "comparison-report.pdf",
   branding: "branding.json",
+  subscription: "_subscription.json",
 } as const;
+
+export function getAdminEmails(): string[] {
+  const raw = process.env.ADMIN_EMAILS ?? "";
+  return raw
+    .split(",")
+    .map((s) => s.trim().toLowerCase())
+    .filter((s) => s.length > 0);
+}
+
+export function isAdminEmail(email: string | undefined | null): boolean {
+  if (!email) return false;
+  return getAdminEmails().includes(email.trim().toLowerCase());
+}
 
 export const LOGO_BASENAME = "logo";
 export const ALLOWED_LOGO_EXTENSIONS = ["png", "jpg", "jpeg", "svg", "webp"] as const;

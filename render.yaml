@@ -37,3 +37,8 @@ services:
         sync: false
       - key: GEMINI_PRO_MODEL
         sync: false
+      # Founder/admin emails that bypass the paywall (comma-separated).
+      # Set this in the Render dashboard to your own email so you always
+      # have access. Leave blank to enforce paywall on everyone.
+      - key: ADMIN_EMAILS
+        sync: false

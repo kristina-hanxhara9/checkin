@@ -32,11 +32,67 @@
   body { @apply bg-background text-foreground; }
 }
 
+/* === Landing page motion === */
+
 @keyframes ai-pulse {
-  0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 hsl(var(--foreground) / 0.25); }
-  50% { transform: scale(1.05); box-shadow: 0 0 0 6px hsl(var(--foreground) / 0); }
+  0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.55); }
+  50% { transform: scale(1.08); box-shadow: 0 0 0 10px rgba(245, 158, 11, 0); }
+}
+.ai-badge { animation: ai-pulse 2s ease-in-out infinite; }
+
+@keyframes float-y {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-6px); }
+}
+.float-slow   { animation: float-y 5s ease-in-out infinite; }
+.float-medium { animation: float-y 4s ease-in-out infinite; animation-delay: -1.2s; }
+.float-fast   { animation: float-y 3.2s ease-in-out infinite; animation-delay: -2s; }
+
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.reveal {
+  opacity: 0;
+  animation: fade-up 700ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+.reveal-delay-1 { animation-delay: 120ms; }
+.reveal-delay-2 { animation-delay: 240ms; }
+.reveal-delay-3 { animation-delay: 360ms; }
+.reveal-delay-4 { animation-delay: 480ms; }
+
+@keyframes gradient-shift {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+.animated-gradient-text {
+  background-size: 200% 200%;
+  animation: gradient-shift 6s ease infinite;
 }
 
-.ai-badge {
-  animation: ai-pulse 2.4s ease-in-out infinite;
+@keyframes arrow-slide {
+  0%   { transform: translateX(0); opacity: 0.4; }
+  50%  { transform: translateX(6px); opacity: 1; }
+  100% { transform: translateX(0); opacity: 0.4; }
+}
+.arrow-anim { animation: arrow-slide 1.8s ease-in-out infinite; }
+
+@keyframes shimmer {
+  0%   { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+.shimmer {
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.6), transparent);
+  background-size: 200% 100%;
+  animation: shimmer 2.5s ease-in-out infinite;
+}
+
+/* Respect users who prefer reduced motion. */
+@media (prefers-reduced-motion: reduce) {
+  .ai-badge, .float-slow, .float-medium, .float-fast,
+  .reveal, .animated-gradient-text, .arrow-anim, .shimmer {
+    animation: none !important;
+  }
+  .reveal { opacity: 1; transform: none; }
 }
